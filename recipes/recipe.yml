@@ -27,6 +27,7 @@ modules:
         - starship
         - minicom
         - virt-manager
+        - kitty
 
   - type: default-flatpaks
     configurations:
