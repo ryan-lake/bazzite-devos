@@ -3,7 +3,7 @@
 # image will be published to ghcr.io/<user>/<name>
 name: bazzite-devos
 # description will be included in the image's metadata
-description: This is my personal OS image.
+description: Bazzite dx image with my customizations.
 
 # the base image to build on top of (FROM) and the version tag to use
 base-image: ghcr.io/ublue-os/bazzite-dx-nvidia
