@@ -12,9 +12,9 @@ ExecStart=/usr/sbin/modprobe snd_acp_config
 ExecStart=/usr/sbin/modprobe snd_acp_legacy_common
 ExecStart=/usr/sbin/modprobe snd_amd_acpi_mach
 ExecStart=/usr/sbin/modprobe snd_soc_nau8821
-ExecStart=/usr/sbin/modprobe snd_acp_pci
-ExecStart=/usr/sbin/modprobe snd_acp_mach
-ExecStart=/usr/sbin/modprobe snd_acp_legacy_mach
+ExecStart=/usr/bin/bash -lc 'grep -q "^snd_acp_pci " /proc/modules || /usr/sbin/insmod /usr/lib/modules/%v/extra/acp-mic/snd-acp-pci.ko.xz'
+ExecStart=/usr/bin/bash -lc 'grep -q "^snd_acp_mach " /proc/modules || /usr/sbin/insmod /usr/lib/modules/%v/extra/acp-mic/snd-acp-mach.ko.xz'
+ExecStart=/usr/bin/bash -lc 'grep -q "^snd_acp_legacy_mach " /proc/modules || /usr/sbin/insmod /usr/lib/modules/%v/extra/acp-mic/snd-acp-legacy-mach.ko.xz'
 RemainAfterExit=yes
 
 [Install]

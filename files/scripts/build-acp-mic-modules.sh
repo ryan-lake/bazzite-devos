@@ -132,7 +132,7 @@ build_for_kernel() {
 
   for module_name in "${module_names[@]}"; do
     module_path="$install_dir/$module_name.ko"
-    xz -f -T0 "$module_path"
+    xz -f -T1 --check=crc32 "$module_path"
     chmod 0644 "$module_path.xz"
   done
 
