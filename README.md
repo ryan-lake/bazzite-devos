@@ -6,7 +6,7 @@ After setup, it is recommended you update this README to describe your custom im
 
 ## Installation
 
-> [!WARNING]  
+> [!WARNING]
 > [This is an experimental feature](https://www.fedoraproject.org/wiki/Changes/OstreeNativeContainerStable), try at your own discretion.
 
 To rebase an existing atomic Fedora installation to the latest build:
@@ -29,6 +29,44 @@ To rebase an existing atomic Fedora installation to the latest build:
   ```
 
 The `latest` tag will automatically point to the latest build. That build will still always use the Fedora version specified in `recipe.yml`, so you won't get accidentally updated to the next major version.
+
+## Kernel Module Signing
+
+This image can sign custom kernel modules during CI. The same signing keypair can be reused for any future modules added to the image. Secure Boot systems need the signing certificate enrolled before signed custom modules can load.
+
+Create a module signing keypair locally:
+
+```bash
+mkdir -p ~/.local/share/module-signing
+openssl req -new -x509 -newkey rsa:4096 \
+  -keyout ~/.local/share/module-signing/kernel-module-signing.key \
+  -outform DER \
+  -out ~/.local/share/module-signing/kernel-module-signing.der \
+  -nodes \
+  -days 3650 \
+  -subj "/CN=Kernel module signing/"
+```
+
+Add these GitHub repository secrets before running the image build:
+
+- `KERNEL_MODULE_SIGNING_KEY`: contents of `~/.local/share/module-signing/kernel-module-signing.key`
+- `KERNEL_MODULE_SIGNING_CERT`: base64 output of `~/.local/share/module-signing/kernel-module-signing.der`
+
+```bash
+base64 -w0 ~/.local/share/module-signing/kernel-module-signing.der
+```
+
+Enroll the same certificate on Secure Boot systems:
+
+```bash
+sudo mokutil --import ~/.local/share/module-signing/kernel-module-signing.der
+```
+
+Reboot and complete enrollment in the MOK manager. After rebasing to the built image, the public cert is also available at `/etc/pki/akmods/certs/kernel-module-signing.der` for verification.
+
+## ACP Mic Kernel Modules
+
+This image builds the temporary AMD ACP mic modules needed for the Bazzite OGC kernel issue where `snd-acp-pci` and `snd-acp-legacy-mach` are missing from the fc44 kernel config. The build uses the generic kernel module signing key above.
 
 ## ISO
 

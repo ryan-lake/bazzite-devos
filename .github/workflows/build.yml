@@ -18,6 +18,9 @@ jobs:
   bluebuild:
     name: Build Custom Image
     runs-on: ubuntu-latest
+    env:
+      KERNEL_MODULE_SIGNING_KEY_SECRET: KERNEL_MODULE_SIGNING_KEY
+      KERNEL_MODULE_SIGNING_CERT_SECRET: KERNEL_MODULE_SIGNING_CERT
     permissions:
       contents: read
       packages: write
@@ -29,10 +32,31 @@ jobs:
           # !! Add your recipes here
           - recipe.yml
     steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Prepare kernel module signing secrets
+        shell: bash
+        env:
+          KERNEL_MODULE_SIGNING_KEY: ${{ secrets[env.KERNEL_MODULE_SIGNING_KEY_SECRET] }}
+          KERNEL_MODULE_SIGNING_CERT: ${{ secrets[env.KERNEL_MODULE_SIGNING_CERT_SECRET] }}
+        run: |
+          set -euo pipefail
+          install -m 0600 /dev/null /tmp/kernel-module-signing.key
+          install -m 0644 /dev/null /tmp/kernel-module-signing.der
+          if [[ -z "${KERNEL_MODULE_SIGNING_KEY}" || -z "${KERNEL_MODULE_SIGNING_CERT}" ]]; then
+            echo "Kernel module signing requires KERNEL_MODULE_SIGNING_KEY and KERNEL_MODULE_SIGNING_CERT repository secrets." >&2
+            exit 1
+          fi
+          printf '%s' "${KERNEL_MODULE_SIGNING_KEY}" > /tmp/kernel-module-signing.key
+          printf '%s' "${KERNEL_MODULE_SIGNING_CERT}" | base64 --decode > /tmp/kernel-module-signing.der
+
       # the build is fully handled by the reusable github action
       - name: Build Custom Image
         uses: blue-build/github-action@v1.11
         with:
+          skip_checkout: true
           recipe: ${{ matrix.recipe }}
           cosign_private_key: ${{ secrets.SIGNING_SECRET }}
           registry_token: ${{ github.token }}

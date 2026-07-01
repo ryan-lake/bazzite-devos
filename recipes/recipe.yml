@@ -29,6 +29,25 @@ modules:
         - virt-viewer
         - kitty
 
+  - type: script
+    env:
+      KERNEL_MODULE_REQUIRE_SIGNING: "1"
+      KERNEL_MODULE_SIGN_KEY: /run/secrets/kernel-module-signing.key
+      KERNEL_MODULE_SIGN_CERT: /run/secrets/kernel-module-signing.der
+    secrets:
+      - type: file
+        source: /tmp/kernel-module-signing.key
+        mount:
+          type: file
+          destination: /run/secrets/kernel-module-signing.key
+      - type: file
+        source: /tmp/kernel-module-signing.der
+        mount:
+          type: file
+          destination: /run/secrets/kernel-module-signing.der
+    scripts:
+      - build-acp-mic-modules.sh
+
   - type: default-flatpaks
     configurations:
       - notify: true # Send notification after install/uninstall is finished (true/false)
@@ -36,7 +55,7 @@ modules:
         # If no repo information is specified, Flathub will be used by default
         install: # system flatpaks we want all users to have and not remove
           - org.gnome.Loupe
-          - eu.betterbird.Betterbird 
+          - eu.betterbird.Betterbird
           - com.bitwarden.desktop
       - scope: user # Also add Flathub user repo, but no user packages
 
