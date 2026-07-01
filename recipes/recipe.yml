@@ -48,6 +48,14 @@ modules:
     scripts:
       - build-acp-mic-modules.sh
 
+  - type: systemd
+    system:
+      enabled:
+        - load-acp-mic-modules.service
+    user:
+      enabled:
+        - restart-audio-after-acp-mic.service
+
   - type: default-flatpaks
     configurations:
       - notify: true # Send notification after install/uninstall is finished (true/false)
