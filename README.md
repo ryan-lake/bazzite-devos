@@ -68,7 +68,7 @@ Reboot and complete enrollment in the MOK manager. After rebasing to the built i
 
 This image builds the temporary AMD ACP mic modules needed for the Bazzite OGC kernel issue where `snd-acp-pci` and `snd-acp-legacy-mach` are missing from the fc44 kernel config. The build uses the generic kernel module signing key above.
 
-The modules are loaded by `load-acp-mic-modules.service`, which preloads the ACP dependencies and then loads `snd_acp_pci`, `snd_acp_mach`, and `snd_acp_legacy_mach` before the display manager starts. A global user service, `restart-audio-after-acp-mic.service`, restarts WirePlumber/PipeWire after login if the ACP PDM machine appears after the user audio session has already scanned devices.
+The build installs the modules under `/usr/lib/modules/<kernel>/extra/acp-mic/` and runs `depmod`, so the normal kernel module loading path can resolve `snd_acp_pci` from the ACP PCI modalias and `snd_acp_legacy_mach` from the ACP PDM platform alias at boot.
 
 ## ISO
 
