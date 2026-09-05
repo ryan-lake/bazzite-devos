@@ -54,7 +54,7 @@ jobs:
 
       # the build is fully handled by the reusable github action
       - name: Build Custom Image
-        uses: blue-build/github-action@v1.11
+        uses: blue-build/github-action@v1.12
         with:
           skip_checkout: true
           recipe: ${{ matrix.recipe }}
